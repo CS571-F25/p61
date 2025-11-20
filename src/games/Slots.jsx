@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { Button, Card, Container } from "react-bootstrap";
-import { Gamepad2 } from "lucide-react";
 import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "../components/Navbar";
