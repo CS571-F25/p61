@@ -1,26 +1,19 @@
 import { motion } from "framer-motion";
-import { Button, Card, Container, Row, Col } from "react-bootstrap";
+import { Button, Card, Container, Row, Col, NavbarCollapse } from "react-bootstrap";
 import { Dice5, Coins, Gamepad2, Heart } from "lucide-react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import Navbar from "./Navbar"
+
 
 export default function Home() {
   const games = [
-    { name: "Blackjack", icon: <Heart size={40} />, color: "linear-gradient(to right, #A8E6CF, #DCEDE1)" },
+    { name: "Blackjack", icon: <Heart size={40} />, color: "linear-gradient(to right, #A9C9FF, #FFBBEC)" },
     { name: "Roulette", icon: <Dice5 size={40} />, color: "linear-gradient(to right, #A9C9FF, #FFBBEC)" },
-    { name: "Slots", icon: <Gamepad2 size={40} />, color: "linear-gradient(to right, #9ED2C6, #C9E4DE)" },
-    { name: "Poker", icon: <Coins size={40} />, color: "linear-gradient(to right, #BFD7EA, #A7C7E7)" },
+    { name: "Slots", icon: <Gamepad2 size={40} />, color: "linear-gradient(to right, #A9C9FF, #FFBBEC)" },
+    { name: "Poker", icon: <Coins size={40} />, color: "linear-gradient(to right, #A9C9FF, #FFBBEC)" },
   ];
 
   let coins;
-
-  if(!sessionStorage.getItem("coins"))
-  {
-    coins = 0;
-  }
-  else
-  {
-    coins = 100;
-  }
 
   return (
     <div
@@ -29,49 +22,9 @@ export default function Home() {
         background: "linear-gradient(to bottom right, #F8FFFB, #E8F4F1)",
         color: "#2E2E2E",
         fontFamily: "'Poppins', sans-serif",
-      }}
-        >
-      {/* Header */}
-      <header
-        className="d-flex justify-content-between align-items-center border-bottom"
-        style={{ borderColor: "#DCEDE1" }}
-      >
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          style={{
-            color: "#5BB79A",
-            fontWeight: "900",
-            margin: "10px"
-          }}
-        >
-          ♣️Cozy Casino
-        </motion.h1>
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          style={{
-            color: "#eadb37ff",
-            fontWeight: "900",
-            margin: 0,
-          }}
-        >
-          Coins: {coins}
-        </motion.h1>
-        <Button
-          style={{
-            background: "linear-gradient(to right, #A8E6CF, #BFD7EA)",
-            margin: "10px",
-            border: "none",
-            color: "#1B1B1B",
-            fontWeight: "600",
-          }}
-        >
-          Sign In
-        </Button>
-      </header>
+      }}>
+      
+      <Navbar/>
 
       {/* Hero Section */}
       <Container className="text-center py-5">
@@ -81,7 +34,7 @@ export default function Home() {
           transition={{ duration: 1 }}
           style={{
             fontSize: "3rem",
-            background: "linear-gradient(to right, #9ED2C6, #A9C9FF)",
+            background: "linear-gradient(to right, #5BB79A  , #A9C9FF)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: "800",
