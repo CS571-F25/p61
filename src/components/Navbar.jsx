@@ -72,7 +72,6 @@ export default function Navbar() {
         </button>
 
         <button
-          onClick={() => navigate("/signin")}
           style={{
             ...navButton,
             fontWeight: "700",
