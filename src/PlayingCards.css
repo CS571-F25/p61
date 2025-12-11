@@ -1,0 +1,55 @@
+.playing-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.card {
+    width: 90px;
+    height: 130px;
+    border-radius: 8px;
+    border: 2px solid #222;
+    background: white;
+    padding: 6px;
+    position: relative;
+    font-family: 'Georgia', serif;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+}
+
+.card.red {
+    color: red;
+}
+
+.card.black {
+    color: black;
+}
+
+.card-corner {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+}
+
+.top-left {
+    top: 6px;
+    left: 6px;
+}
+
+.bottom-right {
+    bottom: 6px;
+    right: 6px;
+    transform: rotate(180deg);
+}
+
+.card-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.large {
+    font-size: 42px;
+}

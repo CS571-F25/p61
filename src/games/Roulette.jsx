@@ -1,179 +1,219 @@
 import { useState } from "react";
 import { Container, Row, Col, Button, Card } from "react-bootstrap";
 import { motion } from "framer-motion";
-import { Dice1, Wallet, RotateCcw } from "lucide-react";
+import { Wallet, RotateCcw } from "lucide-react";
 import Navbar from "../components/Navbar";
+import RouletteWheel from "./RouletteWheel";
+import RouletteGameBoard from "./RouletteGameBoard";
+import { useCoins } from "../context/CoinContext";
+import BetButtons from "./BetButtons";
+
+
+
+const RED_NUMBERS = new Set([
+  1, 3, 5, 7, 9,
+  12, 14, 16, 18,
+  19, 21, 23, 25, 27,
+  30, 32, 34, 36,
+]);
+
+function getColor(num) {
+  if (num === 0) return "Green";
+  return RED_NUMBERS.has(num) ? "Red" : "Black";
+}
+
+function isWinningBet(bet, num, color) {
+  switch (bet) {
+    case "Red":
+      return color === "Red";
+    case "Black":
+      return color === "Black";
+    case "Odd":
+      return num !== 0 && num % 2 === 1;
+    case "Even":
+      return num !== 0 && num % 2 === 0;
+    case "1–18":
+      return num >= 1 && num <= 18;
+    case "19–36":
+      return num >= 19 && num <= 36;
+    default:
+      return false;
+  }
+}
 
 export default function Roulette() {
-  const [coins, setCoins] = useState(1000);   // placeholder
-  const [selectedBet, setSelectedBet] = useState(null); // placeholder
-  const [result, setResult] = useState(null); // placeholder
+  const [BET_AMOUNT, setBet] = useState(10);
+  
+  const { coins, setCoins } = useCoins();
+  const [selectedBet, setSelectedBet] = useState(null);
+  const [result, setResult] = useState(null);
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [lastNumber, setLastNumber] = useState(null);
 
-  const betOptions = [
-    "Red", "Black", "Odd", "Even", "1–18", "19–36"
-  ];
+  const betOptions = ["Red", "Black", "Odd", "Even", "1–18", "19–36"];
+
+  function handleSpin() {
+    if (isSpinning) return;
+
+    if (!selectedBet) {
+      setResult("Please select a bet before spinning!");
+      return;
+    }
+
+    if (coins < BET_AMOUNT) {
+      setResult("Not enough coins to spin.");
+      return;
+    }
+
+    setCoins((c) => c - BET_AMOUNT);
+    setIsSpinning(true);
+    setResult("Spinning...");
+
+    setTimeout(() => {
+      const spunNumber = Math.floor(Math.random() * 37); // 0–36
+      const color = getColor(spunNumber);
+      const win = isWinningBet(selectedBet, spunNumber, color);
+
+      setLastNumber(spunNumber);
+
+      if (win) {
+        setCoins((c) => c + BET_AMOUNT * 2);
+        setResult(
+          `🎉 Ball landed on ${spunNumber} (${color}). You WON ${BET_AMOUNT} coins on "${selectedBet}"!`
+        );
+      } else {
+        setResult(
+          `💸 Ball landed on ${spunNumber} (${color}). You lost ${BET_AMOUNT} coins on "${selectedBet}".`
+        );
+      }
+
+      setIsSpinning(false);
+    }, 1000);
+  }
+
+  function handleReset() {
+    setSelectedBet(null);
+    setResult(null);
+    setLastNumber(null);
+    setBet(10)
+  }
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(to bottom right, #F8FFFB, #E8F4F1)",
         fontFamily: "'Poppins', sans-serif",
         color: "#2E2E2E",
-        paddingTop: "20px",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
-        <Navbar/>
-        <Container>
+      <Navbar />
 
-        {/* Title */}
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-4"
+      <Container
+        className="py-3"
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {/* Title + coins */}
+        <Row className="align-items-center mb-3">
+          <Col
+            xs={12}
+            md={6}
+            className="text-center text-md-start mb-3 mb-md-0"
+          >
+            <motion.h1
+              initial={{ opacity: 0, y: -15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              style={{
+                fontSize: "2.4rem",
+                fontWeight: "900",
+                margin: 0,
+                background: "#3C8269",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              🎡 Roulette
+            </motion.h1>
+            <p
+              style={{
+                margin: 0,
+                marginTop: 4,
+                opacity: 0.7,
+                fontSize: "0.9rem",
+              }}
+            >
+              Place your bet and spin the wheel!
+            </p>
+          </Col>
+
+          <Col
+            xs={12}
+            md={6}
+            className="d-flex justify-content-md-end justify-content-center"
+          >
+            <Card
+              style={{
+                padding: "10px 18px",
+                borderRadius: "16px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+                background: "#FFFFFF",
+                border: "none",
+              }}
+            >
+              <div className="d-flex align-items-center gap-2">
+                <Wallet color="#3C8269" size={22} />
+                <div>
+                  <h1 style={{ fontSize: 16, margin: 0, fontWeight: "700" }}>
+                    {coins} Coins
+                  </h1>
+                  <small>
+                    Bet per spin: {BET_AMOUNT}
+                  </small>
+                </div>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Main content row */}
+        <Row
+          className="g-3"
           style={{
-            fontWeight: "900",
-            background: "linear-gradient(to right, #5BB79A, #A9C9FF)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
+            flex: 1,
+            alignItems: "center",
           }}
         >
-          🎡 Roulette
-        </motion.h1>
-
-        {/* Coins Display */}
-        <div className="d-flex justify-content-center mb-4">
-          <Card
-            style={{
-              padding: "15px 25px",
-              borderRadius: "20px",
-              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.05)",
-              background: "#FFFFFF",
-              border: "none"
-            }}
+          {/* Left: wheel */}
+          <Col
+            xs={12}
+            md={6}
+            className="d-flex justify-content-center mb-3 mb-md-0"
           >
-            <div className="d-flex align-items-center gap-2">
-              <Wallet color="#5BB79A" />
-              <h5 style={{ margin: 0, fontWeight: "700" }}>{coins} Coins</h5>
-            </div>
-          </Card>
-        </div>
-
-        {/* Roulette Wheel Placeholder */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-          className="d-flex justify-content-center mb-4"
-        >
-          <Card
-            style={{
-              width: "260px",
-              height: "260px",
-              borderRadius: "50%",
-              background: "linear-gradient(to bottom right, #A9C9FF, #FFBBEC)",
-              boxShadow: "0 6px 20px rgba(0, 0, 0, 0.15)",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              border: "none",
-            }}
-          >
-            <Dice1 size={80} color="#FFFFFF" />
-          </Card>
-        </motion.div>
-
-        {/* Bet Selection */}
-        <Card
-          className="mb-4"
-          style={{
-            borderRadius: "20px",
-            padding: "20px",
-            background: "#FFFFFF",
-            border: "none",
-            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.05)",
-          }}
-        >
-          <h4 style={{ fontWeight: "700", color: "#5BB79A" }}>Place Your Bet</h4>
-
-          <Row className="mt-3 g-2">
-            {betOptions.map(bet => (
-              <Col xs={6} key={bet}>
-                <Button
-                  onClick={() => setSelectedBet(bet)}
-                  style={{
-                    width: "100%",
-                    background:
-                      selectedBet === bet
-                        ? "linear-gradient(to right, #A8E6CF, #BFD7EA)"
-                        : "linear-gradient(to right, #BFD7EA, #A8E6CF)",
-                    border: "none",
-                    color: "#1B1B1B",
-                    fontWeight: "700",
-                  }}
-                >
-                  {bet}
-                </Button>
-              </Col>
-            ))}
-          </Row>
-        </Card>
-
-        {/* Spin Button */}
-        <div className="text-center mb-4">
-          <Button
-            size="lg"
-            style={{
-              background: "linear-gradient(to right, #A9C9FF, #FFBBEC)",
-              border: "none",
-              color: "#1B1B1B",
-              fontWeight: "700",
-              padding: "10px 30px",
-            }}
-          >
-            Spin Wheel
-          </Button>
-        </div>
-
-        {/* Result Box */}
-        <div className="d-flex justify-content-center mb-5">
-          <Card
-            style={{
-              padding: "20px",
-              borderRadius: "20px",
-              background: "#FFFFFF",
-              border: "none",
-              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.05)",
-              minWidth: "250px",
-              textAlign: "center"
-            }}
-          >
-            {result === null ? (
-              <p className="text-muted m-0">Result will appear here...</p>
-            ) : (
-              <h4 style={{ fontWeight: "700", color: "#5BB79A" }}>{result}</h4>
-            )}
-          </Card>
-        </div>
-
-        {/* Reset Button */}
-        <div className="text-center">
-          <Button
-            size="lg"
-            style={{
-              background: "linear-gradient(to right, #A8E6CF, #BFD7EA)",
-              border: "none",
-              color: "#1B1B1B",
-              fontWeight: "700",
-              padding: "10px 30px",
-            }}
-          >
-            <RotateCcw className="me-2" size={18} />
-            Reset Bets
-          </Button>
-        </div>
-
+            <RouletteWheel isSpinning={isSpinning} lastNumber={lastNumber} />
+          </Col>
+          <Col className = "d-flex">
+            <RouletteGameBoard
+            betOptions={betOptions}
+            selectedBet={selectedBet}
+            onSelectBet={setSelectedBet}
+            result={result}
+            onSpin={handleSpin}
+            onReset={handleReset}
+            isSpinning={isSpinning}
+            coins={coins}
+            betAmount={BET_AMOUNT}
+            lastNumber={lastNumber}
+            />
+            <BetButtons bet = {BET_AMOUNT} setBet = {setBet}/>
+            
+          </Col>
+        </Row>
       </Container>
     </div>
   );
