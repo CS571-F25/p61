@@ -115,7 +115,6 @@ const BlackjackGame = () => {
 
 
     const double = () => {
-        setCoins(coins - bet)
         hit();
         stand();
         setDoubleBet(true)
@@ -137,10 +136,15 @@ const BlackjackGame = () => {
                 </Col>
                 <Col>
                     <h2 style={{ fontWeight: "700", color: "#3C8269" }}>
-                        {!gameState ? "What will you do?" : 
-                        playerTotal > 21 ? "Bust! You Lose" : 
-                        dealerTotal > 21 || playerTotal > dealerTotal ? "You Win!" :
-                        "You Lose"} </h2>
+                        {
+                        !gameState ? "What will you do?" :
+                        playerTotal > 21 ? "Bust! You Lose" :
+                        dealerTotal > 21 && playerTotal <= 21 ? "Dealer Busts! You Win!" :
+                        playerTotal > dealerTotal ? "You Win!" :
+                        dealerTotal > playerTotal ? "You Lose" :
+                        "Push"
+                        }
+                        </h2>
                 </Col>
             </Row>
 
@@ -180,7 +184,7 @@ const BlackjackGame = () => {
                 </div>
             </Card>
             
-            <BlackjackControls gameState = {gameState} playerTotal = {playerTotal} hit = {hit} stand = {stand} double = {double} startGame = {startGame} setCoins = {setCoins} bet = {bet} coins = {coins} doubleBet = {doubleBet}/>
+            <BlackjackControls gameState = {gameState} playerTotal = {playerTotal} hit = {hit} stand = {stand} double = {double} startGame = {startGame} setCoins = {setCoins} bet = {bet} coins = {coins} doubleBet = {doubleBet} dealerTotal = {dealerTotal}/>
 
         </div>
     );

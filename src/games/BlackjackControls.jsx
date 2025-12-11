@@ -1,9 +1,7 @@
 import { Row, Col, Button} from "react-bootstrap";
 import { RefreshCcw } from "lucide-react";
 
-const BlackjackControls = ({ gameState, playerTotal, hit, stand, double, bet, startGame, setCoins , coins, doubleBet}) => {
-
-    console.log(doubleBet)
+const BlackjackControls = ({ gameState, playerTotal, dealerTotal, hit, stand, double, bet, startGame, setCoins , coins, doubleBet}) => {
     const buttonStyle = {
             cursor: "pointer",
             padding: "8px 14px",
@@ -57,14 +55,33 @@ const BlackjackControls = ({ gameState, playerTotal, hit, stand, double, bet, st
                         if(gameState)
                         {
                             startGame()
-                            if(doubleBet)
-                            {
-                                setCoins(coins - (bet * 2))
+
+                            // Amount actually wagered this round:
+                            const wager = doubleBet ? bet * 2 : bet;
+
+                            if (playerTotal > 21) {
+                                // Player busts → automatic loss
+                                setCoins(coins - wager);
                             }
-                            else
-                            {
-                                setCoins(coins - bet)
+                            else if (dealerTotal > 21 && playerTotal <= 21) {
+                                // Dealer busts → player wins
+                                setCoins(coins + wager);
                             }
+                            else if (playerTotal > dealerTotal && playerTotal <= 21) {
+                                // Player wins by higher score
+                                setCoins(coins + wager);
+                            }
+                            else if (dealerTotal > playerTotal && dealerTotal <= 21) {
+                                // Dealer wins by higher score
+                                setCoins(coins - wager);
+                            }
+                            else {
+                                // Push (tie) → return the wager
+                                // No change to coins
+                                setCoins(coins);
+                            }
+
+                            
                             
                         }}}
                 >
